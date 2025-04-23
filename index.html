@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Form</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: #f0f8ff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #f0f8ff;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: opacity 0.5s ease;
+        }
+
+        .loading-animation {
+            width: 100px;
+            height: 100px;
+            position: relative;
+        }
+
+        .loading-animation .circle {
+            width: 20px;
+            height: 20px;
+            background-color: #79b4f2;
+            border-radius: 50%;
+            position: absolute;
+            top: 40px;
+            animation: bounce 1.5s infinite ease-in-out;
+        }
+
+        .loading-animation .circle:nth-child(1) {
+            left: 0;
+            animation-delay: 0s;
+        }
+
+        .loading-animation .circle:nth-child(2) {
+            left: 30px;
+            animation-delay: 0.2s;
+        }
+
+        .loading-animation .circle:nth-child(3) {
+            left: 60px;
+            animation-delay: 0.4s;
+        }
+
+        .loading-animation .circle:nth-child(4) {
+            left: 90px;
+            animation-delay: 0.6s;
+        }
+
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+                background-color: #79b4f2;
+            }
+            50% {
+                transform: translateY(-20px);
+                background-color: #b3d9ff;
+            }
+        }
+
+        .loading-text {
+            margin-top: 20px;
+            color: #79b4f2;
+            font-size: 18px;
+            letter-spacing: 2px;
+        }
+
+        .success-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #f0f8ff;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+        }
+
+        .success-animation {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background-color: #79b4f2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation: pulse 1s infinite alternate;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(121, 180, 242, 0.7);
+            }
+            100% {
+                transform: scale(1.1);
+                box-shadow: 0 0 20px 10px rgba(121, 180, 242, 0);
+            }
+        }
+
+        .checkmark {
+            width: 40px;
+            height: 40px;
+            position: relative;
+        }
+
+        .checkmark:before {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 10px;
+            border-bottom: 4px solid white;
+            border-left: 4px solid white;
+            transform: rotate(-45deg);
+            top: 10px;
+            left: 10px;
+        }
+
+        .success-text {
+            margin-top: 20px;
+            color: #79b4f2;
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        .redirecting {
+            margin-top: 10px;
+            color: #79b4f2;
+            font-size: 16px;
+        }
+
+        .container {
+            width: 350px;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 20px rgba(121, 180, 242, 0.2);
+            transform: translateY(20px);
+            opacity: 0;
+            transition: transform 0.5s ease, opacity 0.5s ease;
+        }
+
+        .container.active {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        h2 {
+            text-align: center;
+            color: #79b4f2;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+
+        .character {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 20px;
+            background-color: #b3d9ff;
+            border-radius: 50%;
+            position: relative;
+            overflow: hidden;
+            animation: float 3s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .face {
+            position: absolute;
+            width: 60px;
+            height: 20px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .eyes {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .eye {
+            width: 14px;
+            height: 14px;
+            background-color: #333;
+            border-radius: 50%;
+            position: relative;
+            animation: blink 3s infinite;
+        }
+
+        @keyframes blink {
+            0%, 95%, 100% {
+                transform: scaleY(1);
+            }
+            97.5% {
+                transform: scaleY(0.1);
+            }
+        }
+
+        .mouth {
+            width: 30px;
+            height: 10px;
+            background-color: #333;
+            border-radius: 0 0 15px 15px;
+            margin: 5px auto 0;
+            transition: all 0.3s ease;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #b3d9ff;
+            border-radius: 30px;
+            font-size: 16px;
+            color: #555;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .form-group input:focus {
+            border-color: #79b4f2;
+            box-shadow: 0 0 10px rgba(121, 180, 242, 0.3);
+        }
+
+        .form-group label {
+            position: absolute;
+            top: 12px;
+            left: 15px;
+            font-size: 16px;
+            color: #999;
+            transition: all 0.3s ease;
+            pointer-events: none;
+        }
+
+        .form-group input:focus ~ label,
+        .form-group input:valid ~ label {
+            top: -10px;
+            left: 15px;
+            font-size: 12px;
+            color: #79b4f2;
+            background: white;
+            padding: 0 5px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 30px;
+            background: linear-gradient(to right, #79b4f2, #b3d9ff);
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(121, 180, 242, 0.4);
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(121, 180, 242, 0.6);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+            box-shadow: 0 5px 15px rgba(121, 180, 242, 0.4);
+        }
+
+        .error-message {
+            color: #ff6b6b;
+            font-size: 14px;
+            text-align: center;
+            margin-top: 10px;
+            height: 20px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .error-message.active {
+            opacity: 1;
+        }
+
+        .clouds {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1;
+        }
+
+        .cloud {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            opacity: 0.8;
+        }
+
+        .cloud:before, .cloud:after {
+            content: '';
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+        }
+
+        .cloud1 {
+            width: 100px;
+            height: 40px;
+            top: 10%;
+            left: 10%;
+            animation: moveCloud 40s linear infinite;
+        }
+
+        .cloud1:before {
+            width: 60px;
+            height: 60px;
+            top: -30px;
+            left: 15px;
+        }
+
+        .cloud1:after {
+            width: 50px;
+            height: 50px;
+            top: -20px;
+            left: 45px;
+        }
+
+        .cloud2 {
+            width: 80px;
+            height: 30px;
+            top: 30%;
+            right: 15%;
+            animation: moveCloud 30s linear infinite reverse;
+        }
+
+        .cloud2:before {
+            width: 50px;
+            height: 50px;
+            top: -25px;
+            left: 10px;
+        }
+
+        .cloud2:after {
+            width: 40px;
+            height: 40px;
+            top: -20px;
+            left: 35px;
+        }
+
+        .cloud3 {
+            width: 120px;
+            height: 50px;
+            bottom: 20%;
+            left: 20%;
+            animation: moveCloud 50s linear infinite;
+        }
+
+        .cloud3:before {
+            width: 70px;
+            height: 70px;
+            top: -35px;
+            left: 20px;
+        }
+
+        .cloud3:after {
+            width: 60px;
+            height: 60px;
+            top: -30px;
+            left: 60px;
+        }
+
+        @keyframes moveCloud {
+            0% {
+                transform: translateX(-150%);
+            }
+            100% {
+                transform: translateX(150vw);
+            }
+        }
+
+        .stars {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 2s infinite alternate;
+        }
+
+        @keyframes twinkle {
+            0% {
+                opacity: 0.2;
+                transform: scale(0.8);
+            }
+            100% {
+                opacity: 0.8;
+                transform: scale(1);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-animation">
+            <div class="circle"></div>
+            <div class="circle"></div>
+            <div class="circle"></div>
+            <div class="circle"></div>
+        </div>
+        <div class="loading-text">Loading...</div>
+    </div>
+
+    <!-- Success Screen -->
+    <div class="success-screen" id="successScreen">
+        <div class="success-animation">
+            <div class="checkmark"></div>
+        </div>
+        <div class="success-text">Login Successful!</div>
+        <div class="redirecting">Redirecting to the main page...</div>
+    </div>
+
+    <!-- Clouds Background -->
+    <div class="clouds">
+        <div class="cloud cloud1"></div>
+        <div class="cloud cloud2"></div>
+        <div class="cloud cloud3"></div>
+    </div>
+
+    <!-- Stars Background -->
+    <div class="stars" id="stars"></div>
+
+    <!-- Login Container -->
+    <div class="container" id="loginContainer">
+        <h2>Selamat Datang!</h2>
+        <div class="character">
+            <div class="face">
+                <div class="eyes">
+                    <div class="eye"></div>
+                    <div class="eye"></div>
+                </div>
+                <div class="mouth" id="mouth"></div>
+            </div>
+        </div>
+        <form id="loginForm">
+            <div class="form-group">
+                <input type="text" id="username" required>
+                <label for="username">Username</label>
+            </div>
+            <button type="submit" class="btn">Login</button>
+        </form>
+        <div class="error-message" id="errorMessage">You're not her</div>
+    </div>
+
+    <script>
+        // Create stars
+        function createStars() {
+            const starsContainer = document.getElementById('stars');
+            const starsCount = 50;
+            
+            for (let i = 0; i < starsCount; i++) {
+                const star = document.createElement('div');
+                star.classList.add('star');
+                
+                // Random position
+                const posX = Math.random() * 100;
+                const posY = Math.random() * 100;
+                
+                // Random size
+                const size = Math.random() * 3 + 1;
+                
+                // Random delay
+                const delay = Math.random() * 2;
+                
+                star.style.left = `${posX}%`;
+                star.style.top = `${posY}%`;
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                star.style.animationDelay = `${delay}s`;
+                
+                starsContainer.appendChild(star);
+            }
+        }
+
+        // Loading screen function
+        function showLoadingScreen() {
+            return new Promise(resolve => {
+                setTimeout(() => {
+                    document.getElementById('loadingScreen').style.opacity = '0';
+                    setTimeout(() => {
+                        document.getElementById('loadingScreen').style.display = 'none';
+                        document.getElementById('loginContainer').classList.add('active');
+                        resolve();
+                    }, 500);
+                }, 2000);
+            });
+        }
+
+        // Success screen function
+        function showSuccessScreen() {
+            return new Promise(resolve => {
+                document.getElementById('successScreen').style.opacity = '1';
+                document.getElementById('successScreen').style.pointerEvents = 'all';
+                document.getElementById('loginContainer').style.opacity = '0';
+                
+                setTimeout(() => {
+                    resolve();
+                }, 2000);
+            });
+        }
+
+        // Validate username
+        function validateUsername(username) {
+            // List of allowed usernames (case-insensitive)
+            const allowedUsernames = [
+                'aura', 
+                'bintang', 
+                'ardhariny', 
+                'ardharini', 
+                'aura bintang ardhariny', 
+                'aura bintang ardarini'
+            ];
+            
+            return allowedUsernames.some(allowed => 
+                allowed.toLowerCase() === username.toLowerCase()
+            );
+        }
+
+        // Update character expression
+        function updateCharacterExpression(type) {
+            const mouth = document.getElementById('mouth');
+            
+            if (type === 'happy') {
+                mouth.style.height = '12px';
+                mouth.style.borderRadius = '15px 15px 0 0';
+            } else if (type === 'sad') {
+                mouth.style.height = '10px';
+                mouth.style.borderRadius = '0 0 15px 15px';
+            } else {
+                mouth.style.height = '3px';
+                mouth.style.borderRadius = '3px';
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', async () => {
+            createStars();
+            await showLoadingScreen();
+            
+            const loginForm = document.getElementById('loginForm');
+            const usernameInput = document.getElementById('username');
+            const errorMessage = document.getElementById('errorMessage');
+            
+            // Focus and blur events for character expression
+            usernameInput.addEventListener('focus', () => {
+                updateCharacterExpression('happy');
+            });
+            
+            usernameInput.addEventListener('blur', () => {
+                updateCharacterExpression('neutral');
+            });
+            
+            // Form submission
+            loginForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const username = usernameInput.value.trim();
+                
+                if (validateUsername(username)) {
+                    updateCharacterExpression('happy');
+                    errorMessage.classList.remove('active');
+                    
+                    // Show success screen
+                    await showSuccessScreen();
+                    
+                    // Redirect to main page (replace with your actual main page URL)
+                    window.location.href = 'Main.html';
+                } else {
+                    updateCharacterExpression('sad');
+                    errorMessage.classList.add('active');
+                    
+                    // Shake effect for error
+                    loginForm.classList.add('shake');
+                    setTimeout(() => {
+                        loginForm.classList.remove('shake');
+                    }, 500);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
